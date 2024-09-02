@@ -78,6 +78,40 @@ use_docker_packages <- function(packages, github = NULL, strict = TRUE, file = "
   docker_entry(to_write, file, write, open, append, quiet = TRUE)
 }
 
+
+
+#' @export
+use_renv <- function(rver = NULL, stack = "verse", date = Sys.Date(), file = "Dockerfile", open = TRUE) {
+  
+  # ask for renv
+  install <- FALSE
+  if (!requireNamespace("renv", quietly = TRUE)) {
+    install <-
+      !usethis::ui_nope("Do you want to use Renv?")
+  }
+  if (install) {
+    install.packages("renv")
+    renv::init()
+  }
+  
+  
+  # install packages in .lockfile
+  if (!is.null(rver)) {
+    for (pkg in rver) {
+      renv::install(pkg)
+    }
+  }
+  
+  # create renv base
+  usethis::use_template(
+    "Renv_base",
+    file,
+    ignore = FALSE,
+    open = open,
+    package = "repro"
+  )
+}
+
 use_docker_apt <- function(apt, update = TRUE, file = "Dockerfile", write = TRUE, open = write, append = TRUE){
   if(length(apt) == 0L)return(NULL)
   to_write <- "RUN "
