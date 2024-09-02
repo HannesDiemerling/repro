@@ -5,6 +5,7 @@
     repro.dockerfile.base = "Dockerfile_base",
     repro.dockerfile.packages = "Dockerfile_packages",
     repro.dockerfile.apt = "Dockerfile_apt",
+    repro.dockerfile.renv = "Renv_base",
     repro.dockerfile.manual = "Dockerfile_manual",
     repro.dockerignore = ".dockerignore",
     repro.makefile.docker = "Makefile_Docker",
