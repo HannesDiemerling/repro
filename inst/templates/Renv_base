@@ -1,0 +1,32 @@
+# Set r options
+RUN R -q -e "options(warn=2)"
+
+# Install renv
+RUN R -e "install.packages('renv', repos = c(CRAN = 'https://packagemanager.posit.co/cran/latest'))"
+
+# Build 'main'
+RUN useradd -ms /bin/bash main
+
+# Set workingdir
+WORKDIR /home/rstudio
+COPY . .
+RUN chown -R main:main .
+
+# Change to 'main'
+USER main
+
+# Config renv
+RUN mkdir renv/.cache
+ENV RENV_PATHS_CACHE=renv/.cache
+ENV RENV_CONFIG_PPM_ENABLED=TRUE
+
+# Restore R
+COPY renv.lock renv.lock
+RUN R -e "renv::restore(prompt = FALSE, repos = c(RSPM = 'https://packagemanager.posit.co/cran/latest'))"
+RUN R -e "renv::isolate()"
+
+# Exponiere den Shiny-Port
+EXPOSE 3838
+
+# Starte die Shiny-App
+CMD ["R", "-q", "-e", "renv::activate()", "-e", "shiny::runApp('test.R')"]
